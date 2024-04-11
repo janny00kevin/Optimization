@@ -1,8 +1,11 @@
 function [result] = fcn_checker(x,y)
-    num_pts = length(x);
+    [num_pts, num_questions] = size(x);
+    res = zeros(6,num_questions);
+    for i = 1:num
+    % num_pts = length(x);
     result = zeros(6,1);
 
-    % logarithmically convexity / concavity
+    %%% logarithmically convexity / concavity %%%
     a = [x(1:end-1), log(y(1:end-1))];
     b = [x(2:end), log(y(2:end))];
     c = b - a;
@@ -33,7 +36,7 @@ function [result] = fcn_checker(x,y)
         result(4) = 0;
     end
 
-    % convexity / concavity
+    %%% convexity / concavity %%%
     a = [x(1:end-1), y(1:end-1)];
     b = [x(2:end), y(2:end)];
     c = b - a;
@@ -60,29 +63,26 @@ function [result] = fcn_checker(x,y)
         end
     end
 
-    % quasi-convexity / concavity
+    %%% quasi-convexity / concavity %%%
     x_axis = [ones(size(c,1),1), zeros(size(c))];
     h = cross(x_axis, [c, zeros(num_pts-1,1)], 2);
+    h = h(h(:,3)~=0,3);  % remove the points whose slope is equal to 0
     % The number of times the slope changes from +/- to -/+
-%     disp(size(h))   (:,3)
-    k = h(1:end-1,3).*h(2:end,3);
-%     disp(size(k))
+    k = h(1:end-1).*h(2:end);
     num_flip = length(k(k<0));
-    disp(num_flip)
-    % 去除0的
-%     hp = h(:,3);
-%     disp(length(hp(hp<0)))
+    % disp(num_flip)
 
-%     if num_flip == 0
-%         result(5) = 1;
-%         result(6) = 1;
-%     elseif num_twist < 3
-%         if c(find(c~=0,1)) < 0
-%             result(5) = 1;
-%         else
-%             result(6) = 1;
-%         end
-%     end
+    if num_flip == 0
+        result(5) = 1;
+        result(6) = 1;
+    elseif num_flip == 1
+        disp(c(find(c(:,2)~=0,1),2))
+        if c(find(c(:,2)~=0,1),2) < 0
+            result(5) = 1;
+        else
+            result(6) = 1;
+        end
+    end
 
 %     g = f(1:end-1).*f(2:end);
 %     num_twist = length(g(g<0)); % number of changes of concavity
