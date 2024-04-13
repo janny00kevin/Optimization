@@ -2,7 +2,7 @@ function [result] = fcn_checker(x,y)
     num_pts = length(x);
     result = zeros(6,1);
 
-    %%% logarithmically convexity / concavity %%%
+    %%% logarithmically convex / concave %%%
     a = [x(1:end-1), log(y(1:end-1))];
     b = [x(2:end), log(y(2:end))];
     c = b - a;
@@ -33,7 +33,7 @@ function [result] = fcn_checker(x,y)
         result(4) = 0;
     end
 
-    %%% convexity / concavity %%%
+    %%% convex / concave %%%
     a = [x(1:end-1), y(1:end-1)];
     b = [x(2:end), y(2:end)];
     c = b - a;
@@ -60,7 +60,7 @@ function [result] = fcn_checker(x,y)
         end
     end
 
-    %%% quasi-convexity / concavity %%%
+    %%% quasi-convex / concave %%%
     x_axis = [ones(size(c,1),1), zeros(size(c))];
     h = cross(x_axis, [c, zeros(num_pts-1,1)], 2);
     h = h(h(:,3)~=0,3);  % remove the points whose slope is equal to 0

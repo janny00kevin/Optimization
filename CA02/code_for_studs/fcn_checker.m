@@ -2,7 +2,6 @@ function [res] = fcn_checker(x,y)
     [num_pts, num_questions] = size(x);
     res = zeros(6,num_questions);
     for i = 1:num_questions
-    % num_pts = length(x);
         result = zeros(6,1);
     
         %%% logarithmically convexity / concavity %%%
@@ -70,13 +69,12 @@ function [res] = fcn_checker(x,y)
         % The number of times the slope changes from +/- to -/+
         k = h(1:end-1).*h(2:end);
         num_flip = length(k(k<0));
-        % disp(num_flip)
     
         if num_flip == 0
             result(5) = 1;
             result(6) = 1;
         elseif num_flip == 1
-            % disp(c(find(c(:,2)~=0,1),2))
+            % the first non-zero slope is + or -
             if c(find(c(:,2)~=0,1),2) < 0
                 result(5) = 1;
             else
@@ -85,7 +83,7 @@ function [res] = fcn_checker(x,y)
         end
         res(:,i) = result;
 
-        % print to console
+        % print it to the console
         if result(1) == 1
             disp('convex : yes')
         else
@@ -106,12 +104,13 @@ function [res] = fcn_checker(x,y)
         else
             disp('superconcave : no')
         end
-        if result(3) == 1
+        if result(5) == 1
             disp('quasiconvex : yes')
         else
             disp('quasiconvex : no')
         end
-        if result(4) == 1
+        if result(6 ...
+                ) == 1
             disp('quasiconcave : yes')
         else
             disp('quasiconcave : no')
@@ -119,17 +118,3 @@ function [res] = fcn_checker(x,y)
         disp(" ")
                         
     end
-
-%     g = f(1:end-1).*f(2:end);
-%     num_twist = length(g(g<0)); % number of changes of concavity
-%     disp(num_twist)
-%     if num_twist == 0
-%         result(5) = 1;
-%         result(6) = 1;
-%     elseif num_twist < 3
-%         if c(find(c~=0,1)) < 0
-%             result(5) = 1;
-%         else
-%             result(6) = 1;
-%         end
-%     end

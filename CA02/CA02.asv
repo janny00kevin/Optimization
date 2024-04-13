@@ -1,19 +1,20 @@
-
 clc; clear; close all;
 load code_for_studs\in_data.mat
-load code_for_studs\baseline.mat
 
 [num_pts, num_questions] = size(x);
-% for i = 1:num_questions
-%     figure
-%     plot(x(:,i),y(:,i));
-% end
+for i = 1:num_questions
+    figure
+    plot(x(:,i),y(:,i));
+    title(i)
+end
 
 res = zeros(6,num_questions);
 for i = 1:num_questions
     res(:,i) = fcn_checker(x(:,i),y(:,i));
 end
 disp(res)
+
+% disp(fcn_checker(x,y))
 
 % i=2;
 % disp(fcn_checker(x(:,i),y(:,i)))
