@@ -1,0 +1,118 @@
+\documentclass[a4paper, onecolumn, , 11pt]{IEEEtran}
+
+\usepackage[noadjust]{cite}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{comment}
+
+\input{Symbol_Shortcut.tex} % Symbols defined by Victor
+
+
+\newtheorem{theorem}{\bf Theorem}		% by Victor
+\newtheorem{corollary}{\bf Corollary}	% by Victor
+\newtheorem{definition}{\bf Definition}	% by Victor
+
+\pagenumbering{arabic}
+% \pagestyle{empty}
+
+\makeatletter
+\def\ifundefined{\@ifundefined}
+\makeatother
+
+\setlength{\parskip}{0ex}
+
+\begin{document}
+
+    %\setlength{\baselineskip}{1.18em}
+    %\addtolength{\baselineskip}{-0.1ex}
+    %\setlength{\baselineskip}{0.95\baselineskip}
+
+
+    \title{\huge Final Project Proposal}
+    \author{312510199 Jing-Hao, Li and 312510197 Zhao-Jie, Luo\\
+        Advisor: Professor Carrson C. Fung\\
+        \small{Apr. 24, 2024}}
+    %\author{Carrson C. Fung$^1$, Man-Wai Kwan$^1$ and Chi-Wah Kok$^2$ \\
+    %\small{$^1$Hong Kong App. Sci. \& Tech. Inst., Hong Kong Sci. Park, Shatin,
+    %$^2$Dept. of EEE, 
+    %Hong Kong Univ. of Sci. \&  Tech., 
+    %HONG KONG\\
+    %e-mail: \emph{c.fung@ieee.org, mwkwan@ieee.org, eekok@ieee.org}} 
+    %\thanks{This work described in this paper has been supported by the Research Grants Council of Hong Kong, China (Project no. CERG HKUST6236/01E)}
+    %}
+
+    \markboth{OPTIMIZATION THEORY AND APPLICATIONS}{}
+
+    \maketitle
+    % here's how you get a publisher's ID mark with the new
+    % IEEEtran.cls.  If you want to use it, don't forget to
+    % also uncomment the \pubidadjcol command (which must be
+    % executed in the second text column) around line 434 below
+    %\pubid{0000--0000/00\$00.00~\copyright~2001 IEEE}
+
+    %\thispagestyle{empty}
+
+    % \begin{comment}
+    %     2021 Spring W8 (4/12~4/18)
+    %     Coverage: Orthogonality
+    % \end{comment}
+
+
+
+    \noindent \textbf{Introduction}\\
+        We consider a communication system which contains one transmitter and one receiver, and they communicate with each other through a interference channel with 
+        Gaussian noise. There are multiple antennas in both transmitter and receiver, implies that it's a MIMO system.\\
+        We are interested in finding the channel coefficients so that we can deal with this interference channel by using some methods in the precoder, then we
+        can alleviate the interference caused by the channel. \\
+        We can send some pilot signals during a time slot, receive these signals which pass through the channel and effected by additive Gaussian noise, 
+        then the system model can be written in this form:
+        $$\Y = \H\X + \W$$
+        Where $\X$ is the transmitted pilot signal, $\W$ is the additive Gaussian noise, $\Y$ is the recieved signal, and $\H$ is the channel coefficients
+        that we want to estimate.\\
+
+    \noindent \textbf{Proposed Approach}\\
+        We can control $\X$, which is the pilot signal, to have some properties. The mostly used is to let it to be concatenated identity matrix.
+        \begin{enumerate}
+            \item If the pilot signal $\X$ is a square matrix, which means that it is just a identity matrix, then the estimation $\widehat{\H}$ could be 
+                $\Y\X^{-1}$, which is equal to $\Y$.
+            \item If $\X$ is a nonsquare concatenated identity matrix, we can obtain $\widehat{\H}= \Y$ multiply the pseudo inverse of $\X$ by using least square method.
+            \item To improve performence, \cite{Carrson} suggests that we can use MMSE based primal-dual optimization method with neural network to estimate ${\H}$.
+                We want to obtain the minimun mean square error between $\H$ and $\widehat{\H}$. Then we reformulate the problem into epigraph form. We also use 
+                parameterize $\widehat{\h}$, which can be a MLP \cite{Eisen2019journal}, so that we can obtain the primal and dual function and thus we can 
+                update the primal and dual variables by gradient descent and ascent via policy gradient \cite{Eisen2019journal} until it converges.
+            \item However, fully connected neural networks are impractical to both train and implement for large scale networks, as their size grows quickly with 
+                network size \cite{Eisen2019conf}, we can use graph neural network \cite{Eisen2020,Naderi2022,Naderi2023,Naderi2024} to be our parameterized 
+                channel estimator to see how it waorks under large number of transmitter and receiver antennas.
+        \end{enumerate}
+        We can compare the performences with these approaches under different SNR and network size.
+
+    % \bibliographystyle{abbrv}
+    % \bibliography{mergedBib}
+    \vspace{1cm}
+
+    \bibstyle{abbrv}
+    \begin{thebibliography}{1}
+    \bibitem{Carrson}
+        Carrson C. Fung, and Dmytro Ivakhnenkov, "Model-Driven Neural Network Based MIMO Channel Estimator"
+    \bibitem{Eisen2019conf}
+        M. Eisen and A. Ribeiro, ``Large scale wireless power allocation with graph neural networks,'' \emph{Proc. of the 2019 IEEE 20th Workshop on Signal Processing Advances in Wireless Communications (SPAWC)}, pp. 1-5, 2019.
+    \bibitem{Eisen2019journal}
+        M. Eisen, C. Zhang, L.F.O. Chamon, D.D. Lee and A. Ribeiro, ``Learning optimal power allocations in wireless systems,'' \emph{IEEE Trans. on Signal Processing}, vol. 67(10), pp. 2775-2790, May 2019.
+    \bibitem{Eisen2020}
+        M. Eisen and A. Ribeiro, ``Optimal wireless resource allocation with random edge graph neural networks,'' \emph{IEEE Trans. on Signal Processing}, vol. 68, pp. 2977-2991, 2020.
+    \bibitem{Naderi2022}    
+        N. NaderiAlizadeh, M. Eisen and A. Ribeiro, ``State-Augmented learnable algorithms for resource management in wireless networks,'' \emph{IEEE Trans. on Signal Processing}, vol. 70, pp. 5898-5912, Dec. 2022.
+    \bibitem{Naderi2023}    
+        N. NaderiAlizadeh, M. Eisen and A. Ribeiro, ``Learning resilient radio resource management policies with graph neural networks,'' \emph{IEEE Trans. on Signal Processing}, volo. 71, pp. 995-1009, Mar. 2023.
+    \bibitem{Naderi2024}
+        S. Das, N. NaderiAlizadeh and A. Ribeiro, ``State-augmented information routing in communication systems with graph neural networks,''  \emph{IEEE Intl. Conf. on Acoustics, Speech and Signal Processing (ICASSP)}, Seoul, South Korea, Apr. 2024.
+        % OpenAI Spinning Up introduction to RL Part 3: Intro to Policy Optimization %: \href{https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html}
+    \end{thebibliography}
+
+\end{document}
+
+
+
+
