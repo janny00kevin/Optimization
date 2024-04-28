@@ -30,7 +30,9 @@
     %\setlength{\baselineskip}{0.95\baselineskip}
 
 
-    \title{\huge Final Project Proposal}
+    \title{ Convex Optimization Project Proposal -\\
+    \huge  MMSE Based MIMO Channel Estimator Via Primal-Dual
+    Optimization Mehthod with Neural Network}
     \author{312510199 Jing-Hao, Li and 312510197 Zhao-Jie, Luo\\
         Advisor: Professor Carrson C. Fung\\
         \small{Apr. 24, 2024}}
@@ -83,14 +85,14 @@
                 parameterize $\widehat{\h}$, which can be a MLP \cite{Eisen2019journal}, so that we can obtain the primal and dual function and thus we can 
                 update the primal and dual variables by gradient descent and ascent via policy gradient \cite{Eisen2019journal} until it converges.
             \item However, fully connected neural networks are impractical to both train and implement for large scale networks, as their size grows quickly with 
-                network size \cite{Eisen2019conf}, we can use graph neural network \cite{Eisen2020,Naderi2022,Naderi2023,Naderi2024} to be our parameterized 
-                channel estimator to see how it waorks under large number of transmitter and receiver antennas.
+                network size \cite{Eisen2019conf}, we can use graph neural network \cite{Eisen2020,Naderi2022,Naderi2023} to be our parameterized 
+                channel estimator to see how it works under large number of transmitter and receiver antennas.
         \end{enumerate}
         We can compare the performences with these approaches under different SNR and network size.
 
     % \bibliographystyle{abbrv}
     % \bibliography{mergedBib}
-    \vspace{1cm}
+    % \vspace{1cm}
 
     \bibstyle{abbrv}
     \begin{thebibliography}{1}
@@ -106,8 +108,8 @@
         N. NaderiAlizadeh, M. Eisen and A. Ribeiro, ``State-Augmented learnable algorithms for resource management in wireless networks,'' \emph{IEEE Trans. on Signal Processing}, vol. 70, pp. 5898-5912, Dec. 2022.
     \bibitem{Naderi2023}    
         N. NaderiAlizadeh, M. Eisen and A. Ribeiro, ``Learning resilient radio resource management policies with graph neural networks,'' \emph{IEEE Trans. on Signal Processing}, volo. 71, pp. 995-1009, Mar. 2023.
-    \bibitem{Naderi2024}
-        S. Das, N. NaderiAlizadeh and A. Ribeiro, ``State-augmented information routing in communication systems with graph neural networks,''  \emph{IEEE Intl. Conf. on Acoustics, Speech and Signal Processing (ICASSP)}, Seoul, South Korea, Apr. 2024.
+    % \bibitem{Naderi2024}
+    %     S. Das, N. NaderiAlizadeh and A. Ribeiro, ``State-augmented information routing in communication systems with graph neural networks,''  \emph{IEEE Intl. Conf. on Acoustics, Speech and Signal Processing (ICASSP)}, Seoul, South Korea, Apr. 2024.
         % OpenAI Spinning Up introduction to RL Part 3: Intro to Policy Optimization %: \href{https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html}
     \end{thebibliography}
 
