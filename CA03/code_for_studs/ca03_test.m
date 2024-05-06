@@ -18,7 +18,7 @@ if abs(optval-lp_opt)< precision
 else
     disp(['LP test FAIL']); 
 end
-%%
+
 temp = randn(n,1); P_0 = temp*temp';
 q_0 = randn(n,1);
 temp = randn(n,1); P_1 = temp*temp';
@@ -32,7 +32,7 @@ if abs(optval-qcqp_opt)< precision
 else
     disp(['QCQP test FAIL']); 
 end
-%%
+
 q = randn(n,1);
 temp = randn(n,1); F = temp*temp';
 temp = randn(n,1); AA = -1*temp*temp';
@@ -46,7 +46,7 @@ if abs(optval-sdp_opt)< precision
 else
     disp(['SDP test FAIL']); 
 end
-%%
+
 H0 = randn(m,n)+1i*randn(m,n);
 H1 = randn(m,n)+1i*randn(m,n);
 alph=1e-3;

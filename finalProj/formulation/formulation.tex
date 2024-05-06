@@ -1,0 +1,251 @@
+\documentclass[a4paper, onecolumn, 11pt]{IEEEtran}
+
+\usepackage[noadjust]{cite}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{comment}
+
+\input{Symbol_Shortcut.tex} % Symbols defined by Victor
+
+
+\newtheorem{theorem}{\bf Theorem}		% by Victor
+\newtheorem{corollary}{\bf Corollary}	% by Victor
+\newtheorem{definition}{\bf Definition}	% by Victor
+
+\pagenumbering{arabic}
+% \pagestyle{empty}
+
+\makeatletter
+\def\ifundefined{\@ifundefined}
+\makeatother
+
+\setlength{\parskip}{0ex}
+
+\begin{document}
+
+    %\setlength{\baselineskip}{1.18em}
+    %\addtolength{\baselineskip}{-0.1ex}
+    %\setlength{\baselineskip}{0.95\baselineskip}
+
+
+    \title{ Convex Optimization Project Formulation -\\
+    \huge  MMSE Based MIMO Channel Estimator Via Primal-Dual
+    Optimization Mehthod with Neural Network}
+    \author{312510199 Jing-Hao, Li and 312510197 Zhao-Jie, Luo\\
+        Advisor: Professor Carrson C. Fung\\
+        \small{May. 8, 2024}}
+    %\author{Carrson C. Fung$^1$, Man-Wai Kwan$^1$ and Chi-Wah Kok$^2$ \\
+    %\small{$^1$Hong Kong App. Sci. \& Tech. Inst., Hong Kong Sci. Park, Shatin,
+    %$^2$Dept. of EEE, 
+    %Hong Kong Univ. of Sci. \&  Tech., 
+    %HONG KONG\\
+    %e-mail: \emph{c.fung@ieee.org, mwkwan@ieee.org, eekok@ieee.org}} 
+    %\thanks{This work described in this paper has been supported by the Research Grants Council of Hong Kong, China (Project no. CERG HKUST6236/01E)}
+    %}
+
+    \markboth{OPTIMIZATION THEORY AND APPLICATIONS}{}
+
+    \maketitle
+    % here's how you get a publisher's ID mark with the new
+    % IEEEtran.cls.  If you want to use it, don't forget to
+    % also uncomment the \pubidadjcol command (which must be
+    % executed in the second text column) around line 434 below
+    %\pubid{0000--0000/00\$00.00~\copyright~2001 IEEE}
+
+    %\thispagestyle{empty}
+
+    % \begin{comment}
+    %     2021 Spring W8 (4/12~4/18)
+    %     Coverage: Orthogonality
+    % \end{comment}
+
+
+
+    \noindent \textbf{Introduction}
+
+        % We consider a communication system which contains one transmitter and one receiver, and they communicate with each other through a interference channel with 
+        % Gaussian noise. There are multiple antennas in both transmitter and receiver, implies that it's a MIMO system.\\
+        Consider a communication system comprising a single transmitter and a single receiver, communicating with each other through an interference channel with 
+        Gaussian noise. To improve efficiency and reliability, both the transmitter and the receiver are equipped with multiple antennas, which it's a MIMO 
+        (Multiple Input Multiple Output) system.
+
+        The key idea behind MIMO is to exploit the spatial diversity or multiplexing of the wireless channel by transmitting data streams over multiple antennas. 
+        This allows for increased data rates, improved link reliability, and better resistance to fading and interference. By using multiple antennas at both ends 
+        of the communication link, MIMO systems can achieve spatial multiplexing, diversity, or beamforming, depending on the specific configuration and application 
+        requirements.
+
+        MIMO technology typically offers numerous advantages, but it may also introduce some challenges and issues, including heightened multipath fading and 
+        interference due to multiple antennas.
+
+        Channel estimation plays a crucial role in communication systems. It's main purpose is to determine the paths through which signals propagate from the transmitter 
+        to the receiver and to understand the signal attenuation and distortion along these paths. The accuracy of channel estimation directly impacts the quality of 
+        signal decoding at the receiver, making it an essential step in many communication systems.
+
+        In many cases, communication signals are affected by factors such as noise, multipath effects, and interference during transmission, all of which can lead to 
+        signal attenuation and distortion. By performing channel estimation, we can better understand these effects and take appropriate compensation measures to ensure 
+        the reliable transmission of signals. Channel estimation can also be used to optimize signal transmission and reception strategies, thereby improving system 
+        performance and efficiency. Therefore, channel estimation is a crucial component in modern communication systems.
+        
+        % We are interested in finding the channel coefficients so that we can deal with this interference channel by using some methods in the precoder, then we
+        % can alleviate the interference caused by the channel. \\
+        We are highly interested in identifying the channel coefficients, as they play a crucial role in effectively managing the interference channel. By employing 
+        methods within the precoder like zero foring, match filter, or MMSE methods.
+        Our aim is to mitigate the interference introduced by the channel and improve the SNR, thereby enhancing the overall performance and 
+        reliability of the communication system.\\
+
+    \noindent \textbf{Problem setup}
+    
+        % We can send some pilot signals during a time slot, receive these signals which pass through the channel and effected by additive Gaussian noise, 
+        % then the system model can be written in this form:
+        % $$\Y = \H\X + \W$$
+        % Where $\X$ is the transmitted pilot signal, $\W$ is the additive Gaussian noise, $\Y$ is the recieved signal, and $\H$ is the channel coefficients
+        % that we want to estimate.\\
+        Assume that the communication signals are affected by additive white Gaussian noise, multipath effects, and interference during transmission, consequently,
+        the system model can be represented in the simple linear form:
+        \begin{equation} \label{eq:sysModel}
+            \Y = \H\X + \W
+        \end{equation}
+
+        Where $\X \in \mathbb{C}^{n_T \times T}$ represents the transmitted pilot signal, $\W \in \mathbb{C}^{n_R \times T}$ represents the additive white Gaussian noise, 
+        $\Y \in \mathbb{C}^{n_R \times T}$ represents the received signal, and $\H \in \mathbb{C}^{n_R \times n_T}$ represents the channel coefficients
+        that we aim to estimate. Here, $n_T$ and $n_R$ are the numbers of transmitted and recieved antennas, respectively. The parameter $T$ denotes the multiple of $n_T$, 
+        and a onefold is commonly used.\\
+
+        Here we let our transmitted signal $\X$ to be pilot signals, which refers to a special predetermined signal transmitted to the receiver. 
+        It is typically used for estimating the channel's state or parameters in wireless communication, therefore,
+        the structure of pilot signal often designed to be easily recognizable and processed in signal processing. 
+
+        % Commonly set to be an identity matrix,  that is, there's only one antenna transmitting at the same time in the transmitter, then it can avoid the interference
+        % causing by other antennas at the same time, sometimes we transmit the identity matrix several times thus for each antennas it can estimate several times, so 
+        % that we let $X$ to be concatenated identity matrix. However, for a distribution of a channel won't change with time, we let the multiplier to be 1. 
+        The pilot signal $\X$ is commonly set to be an identity matrix, this approach ensures that only one antenna transmits at any given time, thereby avoiding 
+        interference caused by other 
+        antennas transmitting simultaneously. Sometimes, we transmit the identity matrix multiple times so that each antenna can be estimated multiple times. Therefore, 
+        we concatenate the identity matrix for matrix $\X$. However, if the channel distribution remains constant over time, we set the multiplier to 1.\\
+
+    \noindent \textbf{Problem Formulation}\\
+        "MMSE introduction"\\
+        Under the assumption of additive Gaussian noise, the Minimum Mean Square Error (MMSE) estimator is a commonly used and effective approach.
+        Let our estimation of vectorized channel $\h$ denoted as $\hat{\h}$, then the Bayesian mean square error of the estimator is 
+        \begin{equation} \label{eq:bmse}
+            \B\M\S\E(\hat{\h}) = \mathbb{E}_{\y,\h}\left[\left\| \h-\hat{\h} \right\|^2_2\right]
+        \end{equation}
+        Therefore, the problem of the MMSE estimator can be formulated as:
+        \begin{equation} \label{eq:mmse1}
+            \hat{\h} = \argmin_{\hat{\h}} \B\M\S\E(\hat{\h})
+        \end{equation}
+        The closed form solution of this MMSE problem is $\hat{\h} = E_{\h|\y}\left[\h|\y\right]$. However, it requires knowledge about the conditional probability
+        $p(\h|\y)$ of $\h$ under observations $\y$, which may be unknown and/or difficult to obtain. We can't simply obtain the closed form optimal solution.\\
+        We need to consider another approach to finding the solution, the equivalent problem of equation (\ref{eq:mmse1}) is
+        \begin{equation} \label{eq:mmse2}
+            \min_{\hat{\h}} \mathbb{E}_{\y,\h}\left[\left\| \h-\hat{\h} \right\|^2_2\right]
+        \end{equation}
+
+    \noindent \textbf{Proposed Approach}\\
+        "primal dual method introduction"
+
+        In order to use primal dual method to iteratively approach the optimal solution, we reformulate (\ref{eq:mmse2}) to its epigraph form:
+        \begin{equation}
+        \begin{aligned} \label{eq:epi}
+            \min_{t,\hat{\mathbf{h}}} \quad & t \\
+            \text{s.t.} \quad & \mathbb{E}_{\mathbf{y},\mathbf{h}}\left[\left\| \mathbf{h}-\hat{\mathbf{h}} \right\|^2_2\right] \leq t
+        \end{aligned}
+        \end{equation}
+        Then the Lagrangian function of (\ref{eq:epi}) can be written as
+        \begin{equation} \label{eq:Lag1}
+            \mathcal{L} \left(\hat{\h},t,\lambda\right) = t + \lambda\left(\mathbb{E}_{\y,\h}\left[\left\| \h-\hat{\h} \right\|^2_2 \right] -t \right)\\
+        \end{equation}
+        In the MMSE estimator, $\hat{\h}$ is a nonlinear function of y, but its exact form is unknown. Also, since $\h \in \mathcal{H} $, 
+        and in turn $\h \in \mathcal{H} $, where $\mathcal{H}$ can be interpreted as a set that contains samples of $h$ (and $\hat{\h}$) from certain 
+        unknown distribution or certain (unknown/complicated) channel models. Herein, a neural network (or graph convolution neural network) may be used to
+        parameterize $\hat{\h}$ so that $\hat{\h}=\phi(\h;\boldsymbol{\theta})$, with $\boldsymbol{\theta}$ denoting the parameters of the neural network.
+        Then the Lagrangian function can also be written as
+        \begin{equation} \label{eq:Lag2}
+            \mathcal{L} \left(\hat{\h},t,\lambda\right) = t + \lambda\left(\mathbb{E}_{\y,\h}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}) \right\|^2_2 \right] -t \right)\\
+        \end{equation}
+        The dual function can then be written as
+        \begin{equation} \label{eq:dual}
+            g(\lambda) = \min_{t,\boldsymbol{\theta}}~ t + \lambda\left(\mathbb{E}_{\y,\h}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}) \right\|^2_2 \right] -t \right)\\
+        \end{equation}
+        It is uncertain whether or not the duality gap equals zero.\\
+        However, the stationary point of $  \mathcal{L} \left(\hat{\h},t,\lambda\right)$ can be found via the KKT conditions by solving for the primal and dual
+        variables alternately using gradient descent and ascent, respectively.\\
+        First, according to the stationarity property of KKT conditions:
+        $\nabla f_0(\x^*) + \sum\limits_{i=1}^{m}\lambda_i^*\nabla f_i(\x^*) + \sum\limits_{i=1}^{p}\nu_i^*\nabla h_i(\x^*) = \0$,
+        take the gradient of Lagrangian (\ref{eq:Lag2}) with respect to the primal and dual variable $\boldsymbol{\theta}, t, \lambda$, respectively.
+        
+        \begin{align} \label{stationarity}
+            \boldsymbol{\theta}^* &= \lambda \nabla_{\boldsymbol{\theta}}
+                \mathbb{E}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}) \right\|^2_2 \right]\\
+            t^* &= 1-\lambda\\
+            \lambda^* &= \left[ \mathbb{E}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}) \right\|^2_2 \right] -t\right]_{+}
+        \end{align}
+        
+        Then we can update the primal and dual variable using gradient descent or ascent iteratively
+
+        \begin{align} \label{update}
+            \boldsymbol{\theta}_{k+1} &= \boldsymbol{\theta}_{k} - 
+                \alpha_{\boldsymbol{\theta},k} \lambda_k \nabla_{\boldsymbol{\theta}_k}
+                \mathbb{E}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}_k) \right\|^2_2 \right]\\
+            t_{k+1} &= t_{k} - \alpha_{t,k}(1-\lambda_k)\\
+            \lambda_{k+1} &= \left[ \lambda_k + \alpha_{\lambda,k}
+                \left( \mathbb{E}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}_{k+1}) \right\|^2_2 \right] 
+                -t_{k+1}\right)\right]_{+}
+        \end{align}
+
+        where $\alpha_{\boldsymbol{\theta},k},~ \alpha_{t,k},~ \lambda_k$ are the step sizes for their respective update equations.
+        According to \cite{Eisen2019journal}, $\nabla_{\boldsymbol{\theta}}\mathbb{E}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}_k) \right\|^2_2 \right]$ 
+        can be computed using finite-difference gradients or policy gradient.
+        It was claimed in \cite{Eisen2019journal} that the finite-difference method can be
+        computational expensive especially when $\boldsymbol{\theta}$ is large, hence, it was suggested that the policy gradient method should be used.
+        Also, \cite{Eisen2020} suggested sampling the distribution in $\mathbb{E}_{\y,\h}$ so that the expectation does not have to be computed in (\ref{update}).
+
+        Then we can iteratively update the primal and dual variables with policy gradient to obtain the solution.
+    
+        
+        % \noindent \textbf{Proposed Approach}\\
+        % We can control $\X$, which is the pilot signal, to have some properties. The mostly used is to let it to be concatenated identity matrix.
+        % \begin{enumerate}
+        %     \item If the pilot signal $\X$ is a square matrix, which means that it is just a identity matrix, then the estimation $\widehat{\H}$ could be 
+        %         $\Y\X^{-1}$, which is equal to $\Y$.
+        %     \item If $\X$ is a nonsquare concatenated identity matrix, we can obtain $\widehat{\H}= \Y$ multiply the pseudo inverse of $\X$ by using least square method.
+        %     \item To improve performence, \cite{Carrson} suggests that we can use MMSE based primal-dual optimization method with neural network to estimate ${\H}$.
+        %         We want to obtain the minimun mean square error between $\H$ and $\widehat{\H}$. Then we reformulate the problem into epigraph form. We also use 
+        %         parameterize $\widehat{\h}$, which can be a MLP \cite{Eisen2019journal}, so that we can obtain the primal and dual function and thus we can 
+        %         update the primal and dual variables by gradient descent and ascent via policy gradient \cite{Eisen2019journal} until it converges.
+        %     \item However, fully connected neural networks are impractical to both train and implement for large scale networks, as their size grows quickly with 
+        %         network size \cite{Eisen2019conf}, we can use graph neural network \cite{Eisen2020,Naderi2022,Naderi2023} to be our parameterized 
+        %         channel estimator to see how it works under large number of transmitter and receiver antennas.
+        % \end{enumerate}
+        % We can compare the performences with these approaches under different SNR and network size.
+
+    % \bibliographystyle{abbrv}
+    % \bibliography{mergedBib}
+    % \vspace{1cm}
+
+    \bibstyle{abbrv}
+    \begin{thebibliography}{1}
+    \bibitem{Carrson}
+        C. C. Fung, and D. Ivakhnenkov, "Model-Driven Neural Network Based MIMO Channel Estimator".
+    \bibitem{Eisen2019conf}
+        M. Eisen and A. Ribeiro, ``Large scale wireless power allocation with graph neural networks,'' \emph{Proc. of the 2019 IEEE 20th Workshop on Signal Processing Advances in Wireless Communications (SPAWC)}, pp. 1-5, 2019.
+    \bibitem{Eisen2019journal}
+        M. Eisen, C. Zhang, L.F.O. Chamon, D.D. Lee and A. Ribeiro, ``Learning optimal power allocations in wireless systems,'' \emph{IEEE Trans. on Signal Processing}, vol. 67(10), pp. 2775-2790, May 2019.
+    \bibitem{Eisen2020}
+        M. Eisen and A. Ribeiro, ``Optimal wireless resource allocation with random edge graph neural networks,'' \emph{IEEE Trans. on Signal Processing}, vol. 68, pp. 2977-2991, 2020.
+    \bibitem{Naderi2022}    
+        N. NaderiAlizadeh, M. Eisen and A. Ribeiro, ``State-Augmented learnable algorithms for resource management in wireless networks,'' \emph{IEEE Trans. on Signal Processing}, vol. 70, pp. 5898-5912, Dec. 2022.
+    \bibitem{Naderi2023}    
+        N. NaderiAlizadeh, M. Eisen and A. Ribeiro, ``Learning resilient radio resource management policies with graph neural networks,'' \emph{IEEE Trans. on Signal Processing}, volo. 71, pp. 995-1009, Mar. 2023.
+    % \bibitem{Naderi2024}
+    %     S. Das, N. NaderiAlizadeh and A. Ribeiro, ``State-augmented information routing in communication systems with graph neural networks,''  \emph{IEEE Intl. Conf. on Acoustics, Speech and Signal Processing (ICASSP)}, Seoul, South Korea, Apr. 2024.
+        % OpenAI Spinning Up introduction to RL Part 3: Intro to Policy Optimization %: \href{https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html}
+    \end{thebibliography}
+
+\end{document}
+
+
+
+

@@ -1,5 +1,5 @@
-function [xopt, optval] = mylp(c,A,b,C,d)
-    cvx_begin
+function [xopt, optval] = mylp(c,A,b,C,d) 
+    cvx_begin quiet
         variable x(length(c))
         minimize (c'*x)
         subject to
