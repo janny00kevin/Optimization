@@ -1,0 +1,104 @@
+clc
+load ca04;
+
+m = size(A,1);
+n = size(A,2);
+P = 7;
+C = rand(m,P);
+R = rand(P,n);
+U = rand(m,n);
+X = rand(m,n);
+
+rho = 0.1;
+iter = 0;
+
+error=norm((X-C*R),"fro");
+disp(['initial error = ',num2str(error,'%.5f')])
+
+PARAF = 1;
+if PARAF==0
+    while true
+        for i=1:m
+            [X(i,:), C(i,:)] = ADMM_xc(A(i,:),R,U(i,:),rho,n,P);
+        end
+        for j=1:n
+            [R(:,j)] = ADMM_r(X(:,j),C,U(:,j),P);
+        end
+        U=U+X-C*R;
+
+        iter=iter+1;
+        error=norm((X-C*R),"fro");
+        fprintf('iter %02d finished, error: %.5f \n', iter, error)
+
+        s = norm(rho*(R-Rp),"fro");
+        if error > 10*s
+            rho = 2*rho;
+            U = U/2;
+        elseif s > 10*error
+            rho = rho/2;
+            U = 2*U;
+        end
+
+        e = 1e-3;
+        t1 = sqrt(m)*e + e*max([norm(X,"fro"),norm(C*R,"fro"),norm(A,"fro")]);
+        t2 = sqrt(m)*e + e*rho*norm(U,"fro");
+        if error < t1 && s < t2
+            break
+        end 
+    end
+else
+    while true
+        Rp = R;
+        ep = error;
+        parfor i=1:m
+            [X(i,:), C(i,:)] = ADMM_xc(A(i,:),R,U(i,:),rho,n,P);
+        end
+        parfor j=1:n
+            [R(:,j)] = ADMM_r(X(:,j),C,U(:,j),P);
+        end
+        U=U+X-C*R;
+
+        iter=iter+1;
+        error=norm((X-C*R),"fro");
+        fprintf('iter %02d finished, error: %.5f \n', iter, error)
+
+        s = norm(rho*(R-Rp),"fro");
+        if error > 10*s
+            rho = 2*rho;
+            U = U/2;
+        elseif s > 10*error
+            rho = rho/2;
+            U = 2*U;
+        end
+
+        e = 1e-3;
+        t1 = sqrt(m)*e + e*max([norm(X,"fro"),norm(C*R,"fro"),norm(A,"fro")]);
+        t2 = sqrt(m)*e + e*rho*norm(U,"fro");
+        if error < t1 && s < t2
+            break
+        end    
+    end
+end
+
+[UA,SA,VA] = svd(A);
+[UX,SX,VX] = svd(C*R);
+fprintf('Sum of singular values of A  = %.5f \n', sum(SA,"all"))        
+fprintf('Sum of singular values of CR = %.5f \n', sum(SX,"all"))
+fprintf('Sum of singular values error = %.5f \n', sum(SA,"all")-sum(SX,"all"))
+
+function [x_opt,c_opt] = ADMM_xc(a,R,u,rho,n,P)
+    cvx_begin quiet
+        variable x_row(1,n) nonnegative
+        variable c_row(1,P) nonnegative
+        minimize (square_pos(norm((a-x_row),"fro"))+rho/2*square_pos(norm((x_row-c_row*R+u),"fro")))
+    cvx_end
+    x_opt=x_row;
+    c_opt=c_row;
+end
+function [r_opt] = ADMM_r(x,C,u,P)
+    cvx_begin quiet
+        variable r_col(P,1) nonnegative
+        minimize (square_pos(norm((x-C*r_col+u),"fro")))
+    cvx_end
+    r_opt=r_col;
+end

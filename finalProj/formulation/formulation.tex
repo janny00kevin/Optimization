@@ -1,4 +1,6 @@
-\documentclass[a4paper, onecolumn, 11pt]{IEEEtran}
+% \documentclass[a4paper, onecolumn, 11pt]{IEEEtran}
+\documentclass[journal,12pt,onecolumn,draftclsnofoot]{IEEEtran}
+% \documentclass[a4paper, onecolumn, 12pt, doublespacing]{IEEEtran}
 
 \usepackage[noadjust]{cite}
 \usepackage{epsfig}
@@ -63,7 +65,8 @@
 
 
 
-    \noindent \textbf{Introduction}
+    % \noindent \textbf{Introduction}
+    \section{Introduction}
 
         % We consider a communication system which contains one transmitter and one receiver, and they communicate with each other through a interference channel with 
         % Gaussian noise. There are multiple antennas in both transmitter and receiver, implies that it's a MIMO system.\\
@@ -79,23 +82,24 @@
         MIMO technology typically offers numerous advantages, but it may also introduce some challenges and issues, including heightened multipath fading and 
         interference due to multiple antennas.
 
-        Channel estimation plays a crucial role in communication systems. It's main purpose is to determine the paths through which signals propagate from the transmitter 
+        Channel estimation plays a crucial role in communication systems. Its main purpose is to determine the paths through which signals propagate from the transmitter 
         to the receiver and to understand the signal attenuation and distortion along these paths. The accuracy of channel estimation directly impacts the quality of 
         signal decoding at the receiver, making it an essential step in many communication systems.
 
         In many cases, communication signals are affected by factors such as noise, multipath effects, and interference during transmission, all of which can lead to 
         signal attenuation and distortion. By performing channel estimation, we can better understand these effects and take appropriate compensation measures to ensure 
         the reliable transmission of signals. Channel estimation can also be used to optimize signal transmission and reception strategies, thereby improving system 
-        performance and efficiency. Therefore, channel estimation is a crucial component in modern communication systems.
+        performance and efficiency. % Therefore, channel estimation is a crucial component in modern communication systems.
         
         % We are interested in finding the channel coefficients so that we can deal with this interference channel by using some methods in the precoder, then we
         % can alleviate the interference caused by the channel. \\
         We are highly interested in identifying the channel coefficients, as they play a crucial role in effectively managing the interference channel. By employing 
         methods within the precoder like zero foring, match filter, or MMSE methods.
-        Our aim is to mitigate the interference introduced by the channel and improve the SNR, thereby enhancing the overall performance and 
+        Then these methods are avle to mitigate the interference introduced by the channel and improve the SNR, thereby enhancing the overall performance and 
         reliability of the communication system.\\
 
-    \noindent \textbf{Problem setup}
+    % \noindent \textbf{Problem setup}
+    \section{Problem setup}
     
         % We can send some pilot signals during a time slot, receive these signals which pass through the channel and effected by additive Gaussian noise, 
         % then the system model can be written in this form:
@@ -111,7 +115,7 @@
         Where $\X \in \mathbb{C}^{n_T \times T}$ represents the transmitted pilot signal, $\W \in \mathbb{C}^{n_R \times T}$ represents the additive white Gaussian noise, 
         $\Y \in \mathbb{C}^{n_R \times T}$ represents the received signal, and $\H \in \mathbb{C}^{n_R \times n_T}$ represents the channel coefficients
         that we aim to estimate. Here, $n_T$ and $n_R$ are the numbers of transmitted and recieved antennas, respectively. The parameter $T$ denotes the multiple of $n_T$, 
-        and a onefold is commonly used.\\
+        and one unit of $n_T$ is commonly used.\\
 
         Here we let our transmitted signal $\X$ to be pilot signals, which refers to a special predetermined signal transmitted to the receiver. 
         It is typically used for estimating the channel's state or parameters in wireless communication, therefore,
@@ -125,9 +129,9 @@
         antennas transmitting simultaneously. Sometimes, we transmit the identity matrix multiple times so that each antenna can be estimated multiple times. Therefore, 
         we concatenate the identity matrix for matrix $\X$. However, if the channel distribution remains constant over time, we set the multiplier to 1.\\
 
-    \noindent \textbf{Problem Formulation}\\
-        "MMSE introduction"\\
-        Under the assumption of additive Gaussian noise, the Minimum Mean Square Error (MMSE) estimator is a commonly used and effective approach.
+    \section{Problem Formulation}
+        % "MMSE introduction"\\
+        Under the assumption of Gaussian distribution channel, the Minimum Mean Square Error (MMSE) estimator is a commonly used and effective approach.
         Let our estimation of vectorized channel $\h$ denoted as $\hat{\h}$, then the Bayesian mean square error of the estimator is 
         \begin{equation} \label{eq:bmse}
             \B\M\S\E(\hat{\h}) = \mathbb{E}_{\y,\h}\left[\left\| \h-\hat{\h} \right\|^2_2\right]
@@ -141,11 +145,9 @@
         We need to consider another approach to finding the solution, the equivalent problem of equation (\ref{eq:mmse1}) is
         \begin{equation} \label{eq:mmse2}
             \min_{\hat{\h}} \mathbb{E}_{\y,\h}\left[\left\| \h-\hat{\h} \right\|^2_2\right]
-        \end{equation}
+        \end{equation}\\
 
-    \noindent \textbf{Proposed Approach}\\
-        "primal dual method introduction"
-
+    \section{Proposed Approach}
         In order to use primal dual method to iteratively approach the optimal solution, we reformulate (\ref{eq:mmse2}) to its epigraph form:
         \begin{equation}
         \begin{aligned} \label{eq:epi}
@@ -182,9 +184,7 @@
             t^* &= 1-\lambda\\
             \lambda^* &= \left[ \mathbb{E}\left[\left\| \h-\phi(\mathbf{y};\boldsymbol{\theta}) \right\|^2_2 \right] -t\right]_{+}
         \end{align}
-        
         Then we can update the primal and dual variable using gradient descent or ascent iteratively
-
         \begin{align} \label{update}
             \boldsymbol{\theta}_{k+1} &= \boldsymbol{\theta}_{k} - 
                 \alpha_{\boldsymbol{\theta},k} \lambda_k \nabla_{\boldsymbol{\theta}_k}
