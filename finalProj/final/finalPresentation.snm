@@ -1,0 +1,13 @@
+\beamer@slide {eq:sysModel}{3}
+\beamer@slide {vecSysModel}{3}
+\beamer@slide {eq:mmse1}{4}
+\beamer@slide {eq:bmse}{4}
+\beamer@slide {eq:mmse2}{4}
+\beamer@slide {eq:epi}{5}
+\beamer@slide {eq:Lag1}{5}
+\beamer@slide {policy gradient}{8}
+\beamer@slide {fig:exp diagram}{10}
+\beamer@slide {tab:Configuration}{17}
+\beamer@slide {NMSE}{17}
+\beamer@slide {fig:train_result}{19}
+\beamer@slide {fig:test_result}{19}
